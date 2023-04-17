@@ -8,7 +8,7 @@ router = APIRouter()
     "/{path:path}", methods=["GET", "POST", "PUT", "DELETE", "OPTIONS", "HEAD", "PATCH"]
 )
 async def proxy(path: str, request: Request):
-    url = f"https://httpbin.org/{path}"
+    url = f"http://localhost:8080/{path}"
     headers = dict(request.headers)
     data = await request.body()
     try:

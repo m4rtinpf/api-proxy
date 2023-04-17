@@ -1,6 +1,12 @@
 # api-proxy
 
-This project was generated via [manage-fastapi](https://ycd.github.io/manage-fastapi/)! :tada:
+## Echo server
+
+https://hub.docker.com/r/ealen/echo-server
+
+```
+docker run -p 8080:80 ealen/echo-server
+```
 
 ## License
 
