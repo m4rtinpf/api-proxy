@@ -1,7 +1,9 @@
-import httpx
+import aiohttp
 from fastapi import APIRouter, Request, Response
 
 router = APIRouter()
+
+async_client = aiohttp.ClientSession()
 
 
 @router.api_route(
@@ -16,12 +18,11 @@ async def proxy(path: str, request: Request):
         headers.pop("host")
     except KeyError:
         pass
-    async with httpx.AsyncClient() as client:
-        response = await client.request(
-            request.method, url, headers=headers, content=data
+    async with async_client.request(
+        request.method, url, headers=headers, data=data
+    ) as response:
+        return Response(
+            content=await response.content.read(),
+            status_code=response.status,
+            headers=response.headers,
         )
-    return Response(
-        content=response.content,
-        status_code=response.status_code,
-        headers=response.headers,
-    )
