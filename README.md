@@ -2,10 +2,10 @@
 
 ## Echo server
 
-https://hub.docker.com/r/ealen/echo-server
+https://github.com/ErikWegner/rsecho
 
 ```
-docker run -p 8080:80 ealen/echo-server
+docker run -p 8080:3000 erikwegner/rsecho
 ```
 
 ## License
