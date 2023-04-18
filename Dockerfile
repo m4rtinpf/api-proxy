@@ -1,10 +1,3 @@
-FROM nginx
-
-# Copy the nginx configuration file into the container
-COPY nginx.conf /etc/nginx/nginx.conf
-
-# Expose ports 80 and 443
-EXPOSE 8000
-
-# Start nginx
-CMD ["nginx", "-g", "daemon off;"]
+FROM envoyproxy/envoy:v1.26-latest
+COPY ./envoy.yaml /etc/envoy/envoy.yaml
+RUN chmod go+r /etc/envoy/envoy.yaml
