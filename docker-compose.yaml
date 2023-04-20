@@ -1,0 +1,21 @@
+version: '3'
+
+services:
+  proxy:
+    image: envoyproxy/envoy:v1.26-latest
+    ports:
+      - "8000:8000"
+      - "9901:9901"
+    volumes:
+      - ./envoy.yaml:/etc/envoy/envoy.yaml
+    command: [ "envoy", "-c", "/etc/envoy/envoy.yaml" ]
+
+  products:
+    image: erikwegner/rsecho
+    ports:
+      - "3000:3000"
+
+  sellers:
+    image: erikwegner/rsecho
+    ports:
+      - "3001:3000"

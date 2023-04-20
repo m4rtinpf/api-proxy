@@ -1,7 +1,7 @@
 import http from 'k6/http';
 
 const echoServer='http://localhost:3000/'
-const proxy='http://localhost:8000/api/v1/product/endpoint'
+const proxy='http://localhost:8000/api/v1/products/endpoint'
 
 export const options = {
   discardResponseBodies: true,

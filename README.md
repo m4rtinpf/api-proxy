@@ -1,24 +1,29 @@
 # api-proxy
 
-## Echo server
-
-https://github.com/ErikWegner/rsecho
+## Run
 
 ```shell
-docker run -p 3000:3000 erikwegner/rsecho
+docker compose up
 ```
 
-## Envoy
+## Paths
 
-```shell
-docker rm /envoy && docker build -t envoy:v1 . && docker run -d --network=host --name envoy envoy:v1
+### `products` service server
 
-```
+[http://localhost:3000/api/v1/products](http://localhost:3000/api/v1/products)
 
-## FastAPI
+### `sellers` service server
 
-Max 2k RPS
+[http://localhost:3001/api/v1/sellers](http://localhost:3000/api/v1/sellers)
 
-## License
+### Client-facing `products` service
 
-This project is licensed under the terms of the MIT license.
+[http://localhost:8000/api/v1/products](http://localhost:8000/api/v1/products)
+
+### Client-facing `sellers` service
+
+[http://localhost:8000/api/v1/sellers](http://localhost:8000/api/v1/sellers)
+
+### Proxy management UI
+
+[http://localhost:9901](http://localhost:9901)
