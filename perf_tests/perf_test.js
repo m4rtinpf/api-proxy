@@ -1,14 +1,14 @@
 import http from 'k6/http';
 
-const echoServer='http://localhost:8080/'
-const proxy='http://localhost:8000/api/v1/proxy/endpoint'
+const echoServer='http://localhost:3000/'
+const proxy='http://localhost:8000/api/v1/product/endpoint'
 
 export const options = {
   discardResponseBodies: true,
   scenarios: {
     constant_request_rate: {
       executor: 'constant-arrival-rate',
-      rate: 30000,
+      rate: 300,
       timeUnit: '1s', // 1000 iterations per second, i.e. 1000 RPS
       duration: '30s',
       preAllocatedVUs: 10000, // how large the initial pool of VUs would be

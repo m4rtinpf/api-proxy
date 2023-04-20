@@ -20,19 +20,20 @@ static_resources:
                     - name: local_service
                       domains: [ "*" ]
                       routes:
-                        - match: { prefix: "/" }
-                          route: { cluster: some_service }
+                        - match: { prefix: "/api/v1/product" }
+                          route: { cluster: product_service }
+                        - match: { prefix: "/api/v1/seller" }
+                          route: { cluster: seller_service }
                 http_filters:
                   - name: envoy.filters.http.router
                     typed_config:
                       "@type": type.googleapis.com/envoy.extensions.filters.http.router.v3.Router
   clusters:
-    - name: some_service
-      connect_timeout: 0.25s
+    - name: product_service
+      connect_timeout: 5s
       type: STATIC
-      lb_policy: ROUND_ROBIN
       load_assignment:
-        cluster_name: some_service
+        cluster_name: product_service
         endpoints:
           - lb_endpoints:
               - endpoint:
@@ -40,3 +41,15 @@ static_resources:
                     socket_address:
                       address: 127.0.0.1
                       port_value: 3000
+    - name: seller_service
+      connect_timeout: 5s
+      type: STATIC
+      load_assignment:
+        cluster_name: seller_service
+        endpoints:
+          - lb_endpoints:
+              - endpoint:
+                  address:
+                    socket_address:
+                      address: 127.0.0.1
+                      port_value: 3001
