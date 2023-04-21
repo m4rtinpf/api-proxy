@@ -1,9 +1,9 @@
 import http from 'k6/http';
 
-const productsServer='http://localhost:3000/api/v1/products/endpoint'
-const sellersServer='http://localhost:3000/api/v1/sellers/1'
+const productsServer='http://localhost:3000/endpoint'
+const sellersServer='http://localhost:3000/items/1'
 const products='http://localhost:8000/api/v1/products'
-const sellers='http://localhost:8000/api/v1/sellers/1'
+const sellers='http://localhost:8000/api/v1/sellers/items/1'
 
 export const options = {
   discardResponseBodies: true,
