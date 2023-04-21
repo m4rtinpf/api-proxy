@@ -29,8 +29,13 @@ static_resources:
                                   - request_headers:
                                       header_name: ":path"
                                       descriptor_key: "products"
-                        - match: { prefix: "/api/v1/sellers" }
-                          route: { cluster: sellers_service }
+                        - match:
+                            prefix: "/api/v1/sellers"
+                          route:
+                            cluster: sellers_service
+                            rate_limits:
+                              - actions:
+                                  - remote_address: { }
                 http_filters:
                   - name: envoy.filters.http.ratelimit
                     typed_config:

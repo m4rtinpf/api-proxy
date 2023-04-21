@@ -5,3 +5,10 @@ descriptors:
     rate_limit:
       unit: second
       requests_per_unit: 200
+
+  - key: remote_address
+    # put the source IP address here
+    value: $IP_ADDRESS
+    rate_limit:
+      unit: second
+      requests_per_unit: 1000
