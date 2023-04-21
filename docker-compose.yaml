@@ -9,6 +9,10 @@ services:
     volumes:
       - ./envoy.yaml:/etc/envoy/envoy.yaml
     command: [ "envoy", "-c", "/etc/envoy/envoy.yaml" ]
+    labels:
+      prometheus.io/scrape: 'true'
+      prometheus.io/port: '9901'
+      prometheus.io/path: '/stats/prometheus'
 
   products:
     image: erikwegner/rsecho
@@ -46,3 +50,12 @@ services:
       - RUNTIME_SUBDIRECTORY=ratelimit
       - RUNTIME_WATCH_ROOT=false
       - CONFIG_TYPE=${CONFIG_TYPE:-FILE}
+
+  stats:
+    image: prom/prometheus
+    ports:
+      - "9090:9090"
+    depends_on:
+      - proxy
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
