@@ -20,36 +20,79 @@ static_resources:
                     - name: local_service
                       domains: [ "*" ]
                       routes:
-                        - match: { prefix: "/api/v1/product" }
-                          route: { cluster: product_service }
-                        - match: { prefix: "/api/v1/seller" }
-                          route: { cluster: seller_service }
+                        - match:
+                            prefix: "/api/v1/products"
+                          route:
+                            cluster: products_service
+                            rate_limits:
+                              - actions:
+                                  - request_headers:
+                                      header_name: ":path"
+                                      descriptor_key: "products"
+                        - match:
+                            prefix: "/api/v1/sellers"
+                          route:
+                            cluster: sellers_service
+                            rate_limits:
+                              - actions:
+                                  - remote_address: { }
                 http_filters:
+                  - name: envoy.filters.http.ratelimit
+                    typed_config:
+                      "@type": type.googleapis.com/envoy.extensions.filters.http.ratelimit.v3.RateLimit
+                      domain: rl
+                      request_type: external
+                      stage: 0
+                      rate_limited_as_resource_exhausted: true
+                      failure_mode_deny: false
+                      enable_x_ratelimit_headers: DRAFT_VERSION_03
+                      rate_limit_service:
+                        grpc_service:
+                          envoy_grpc:
+                            cluster_name: ratelimit
+                        transport_api_version: V3
                   - name: envoy.filters.http.router
                     typed_config:
                       "@type": type.googleapis.com/envoy.extensions.filters.http.router.v3.Router
   clusters:
-    - name: product_service
-      connect_timeout: 5s
-      type: STATIC
+    - name: ratelimit
+      type: STRICT_DNS
+      connect_timeout: 1s
+      lb_policy: ROUND_ROBIN
+      protocol_selection: USE_CONFIGURED_PROTOCOL
+      http2_protocol_options: { }
       load_assignment:
-        cluster_name: product_service
+        cluster_name: ratelimit
         endpoints:
           - lb_endpoints:
               - endpoint:
                   address:
                     socket_address:
-                      address: 127.0.0.1
+                      address: ratelimit
+                      port_value: 8081
+    - name: products_service
+      connect_timeout: 5s
+      type: LOGICAL_DNS
+      lb_policy: ROUND_ROBIN
+      load_assignment:
+        cluster_name: products_service
+        endpoints:
+          - lb_endpoints:
+              - endpoint:
+                  address:
+                    socket_address:
+                      address: products
                       port_value: 3000
-    - name: seller_service
+    - name: sellers_service
       connect_timeout: 5s
-      type: STATIC
+      type: LOGICAL_DNS
+      lb_policy: ROUND_ROBIN
       load_assignment:
-        cluster_name: seller_service
+        cluster_name: sellers_service
         endpoints:
           - lb_endpoints:
               - endpoint:
                   address:
                     socket_address:
-                      address: 127.0.0.1
-                      port_value: 3001
+                      address: sellers
+                      port_value: 3000
