@@ -20,15 +20,51 @@ static_resources:
                     - name: local_service
                       domains: [ "*" ]
                       routes:
-                        - match: { prefix: "/api/v1/products" }
-                          route: { cluster: products_service }
+                        - match:
+                            prefix: "/api/v1/products"
+                          route:
+                            cluster: products_service
+                            rate_limits:
+                              - actions:
+                                  - request_headers:
+                                      header_name: ":path"
+                                      descriptor_key: "products"
                         - match: { prefix: "/api/v1/sellers" }
                           route: { cluster: sellers_service }
                 http_filters:
+                  - name: envoy.filters.http.ratelimit
+                    typed_config:
+                      "@type": type.googleapis.com/envoy.extensions.filters.http.ratelimit.v3.RateLimit
+                      domain: rl
+                      request_type: external
+                      stage: 0
+                      rate_limited_as_resource_exhausted: true
+                      failure_mode_deny: false
+                      enable_x_ratelimit_headers: DRAFT_VERSION_03
+                      rate_limit_service:
+                        grpc_service:
+                          envoy_grpc:
+                            cluster_name: ratelimit
+                        transport_api_version: V3
                   - name: envoy.filters.http.router
                     typed_config:
                       "@type": type.googleapis.com/envoy.extensions.filters.http.router.v3.Router
   clusters:
+    - name: ratelimit
+      type: STRICT_DNS
+      connect_timeout: 1s
+      lb_policy: ROUND_ROBIN
+      protocol_selection: USE_CONFIGURED_PROTOCOL
+      http2_protocol_options: { }
+      load_assignment:
+        cluster_name: ratelimit
+        endpoints:
+          - lb_endpoints:
+              - endpoint:
+                  address:
+                    socket_address:
+                      address: ratelimit
+                      port_value: 8081
     - name: products_service
       connect_timeout: 5s
       type: LOGICAL_DNS
